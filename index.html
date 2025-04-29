@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>割り勘計算アプリ</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>割り勘計算アプリ</h1>
+            <p>グループでの支出を簡単に管理し、清算方法を計算します</p>
+        </div>
+        
+        <div class="section">
+            <h2>参加者</h2>
+            <table id="participants-table">
+                <thead>
+                    <tr>
+                        <th>名前</th>
+                        <th class="actions-cell">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="participants-body">
+                    <tr>
+                        <td>
+                            <input type="text" placeholder="名前を入力" class="participant-name">
+                        </td>
+                        <td class="actions-cell">
+                            <button onclick="removeParticipant(this)" class="btn-danger">削除</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button onclick="addParticipant()" class="btn-primary btn-add">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                参加者を追加
+            </button>
+        </div>
+        
+        <div class="section">
+            <h2>支払い情報</h2>
+            <table id="payments-table">
+                <thead>
+                    <tr>
+                        <th>項目名</th>
+                        <th>支払者</th>
+                        <th>金額</th>
+                        <th class="actions-cell">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="payments-body">
+                    <tr>
+                        <td>
+                            <input type="text" placeholder="項目名" class="description">
+                        </td>
+                        <td>
+                            <select class="payer"></select>
+                        </td>
+                        <td>
+                            <input type="number" placeholder="金額" class="amount" min="0" step="1">
+                        </td>
+                        <td class="actions-cell">
+                            <button onclick="removePayment(this)" class="btn-danger">削除</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button onclick="addPayment()" class="btn-primary btn-add">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                支払いを追加
+            </button>
+        </div>
+        
+        <div class="section">
+            <h2>清算方法</h2>
+            
+            <div class="radio-container">
+                <label class="radio-label">
+                    <input type="radio" name="settlement-method" id="settlement-equal" value="equal" checked>
+                    <span>均等に割り勘</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="settlement-method" id="settlement-proportional" value="proportional">
+                    <span>参加者ごとに異なる割合</span>
+                </label>
+            </div>
+            
+            <div id="proportional-ratios" style="display: none; margin-top: 20px;">
+                <h3>割合の設定</h3>
+                <table id="ratio-table">
+                    <thead>
+                        <tr>
+                            <th>参加者</th>
+                            <th>割合</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratio-body"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <button onclick="calculate()" class="btn-success">
+            <svg class="icon" viewBox="0 0 24 24" style="margin-right: 8px;">
+                <path d="M9 7h6m-3-3v6m-6 3h12"></path>
+            </svg>
+            計算する
+        </button>
+        
+        <div class="section" id="results-section" style="display: none;">
+            <h2>計算結果</h2>
+            
+            <div>
+                <h3>支払い詳細</h3>
+                <table id="payment-details">
+                    <thead>
+                        <tr>
+                            <th>項目名</th>
+                            <th>支払った人</th>
+                            <th>金額</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payment-details-body"></tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">合計</th>
+                            <th id="total-amount"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h3>各自の負担額</h3>
+                <table id="share-details">
+                    <thead>
+                        <tr>
+                            <th>名前</th>
+                            <th>負担額</th>
+                            <th>支払済み額</th>
+                            <th>差額</th>
+                        </tr>
+                    </thead>
+                    <tbody id="share-details-body"></tbody>
+                </table>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <h3>清算方法</h3>
+                <div id="settlement-results"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
