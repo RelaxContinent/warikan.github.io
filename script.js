@@ -154,6 +154,7 @@ function calculate() {
         
         if (payer && !isNaN(amount) && amount > 0) {
             payments.push({
+                description: row.querySelector('.description').value,
                 payer,
                 amount
             });
@@ -252,7 +253,7 @@ function calculateMinimalTransactions(shares, participants) {
         settlements.push({
             from: debtors[i].name,
             to: creditors[i].name,
-            amount: Math.round(Math.min(debtors[i].amount, creditor[i].amount) * 100) / 100
+            amount: Math.round(Math.min(debtors[i].amount, creditors[i].amount) * 100) / 100
         });
     }
     
