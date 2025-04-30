@@ -152,13 +152,13 @@ button {
     background-color: #059669;
 }
 
-.btn-danger {
+.btn-delete {
     background-color: #ef4444;
     color: white;
     min-width: 70px;
 }
 
-.btn-danger:hover {
+.btn-delete:hover {
     background-color: #dc2626;
 }
 

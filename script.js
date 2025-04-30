@@ -39,7 +39,7 @@ function addParticipant() {
             <input type="text" placeholder="名前を入力" class="participant-name">
         </td>
         <td class="actions-cell">
-            <button onclick="removeParticipant(this)" class="btn-danger">削除</button>
+            <button onclick="removeParticipant(this)" class="btn-delete">削除</button>
         </td>
     `;
     participantsBody.appendChild(newRow);
@@ -77,7 +77,7 @@ function addPayment() {
             <input type="number" placeholder="金額" class="amount" min="0" step="1">
         </td>
         <td class="actions-cell">
-            <button onclick="removePayment(this)" class="btn-danger">削除</button>
+            <button onclick="removePayment(this)" class="btn-delete">削除</button>
         </td>
     `;
     paymentsBody.appendChild(newRow);
@@ -149,13 +149,11 @@ function calculate() {
     let totalAmount = 0;
     
     paymentRows.forEach(row => {
-        const description = row.querySelector('.description').value.trim();
         const payer = row.querySelector('.payer').value;
         const amount = parseFloat(row.querySelector('.amount').value);
         
         if (payer && !isNaN(amount) && amount > 0) {
             payments.push({
-                description: description || '項目名なし',
                 payer,
                 amount
             });
@@ -185,33 +183,38 @@ function calculate() {
         shares[payment.payer].paid += payment.amount;
     });
     
-    // 割合に応じた負担額を計算
-    if (method === 'proportional') {
-        const ratioInputs = document.querySelectorAll('.ratio-input');
-        let totalRatio = 0;
-        
-        ratioInputs.forEach(input => {
-            totalRatio += parseFloat(input.value) || 0;
-        });
-        
-        if (totalRatio === 0) {
-            alert('少なくとも1人の参加者に1以上の割合を設定してください。');
+    switch (method) {
+        case 'equal':
+            // 均等割り勘
+            participants.forEach(name => {
+                shares[name].shouldPay = totalAmount / participants.length;
+            });
+            break;
+        case 'proportional':
+            // 割合に応じた負担額を計算
+            const ratioInputs = document.querySelectorAll('.ratio-input');
+            let totalRatio = 0;
+            
+            ratioInputs.forEach(input => {
+                totalRatio += parseFloat(input.value) || 0;
+            });
+            
+            if (totalRatio === 0) {
+                alert('少なくとも1人の参加者に1以上の割合を設定してください。');
+                return;
+            }
+            
+            ratioInputs.forEach(input => {
+                const name = input.dataset.name;
+                const ratio = parseFloat(input.value) || 0;
+                shares[name].shouldPay = (ratio / totalRatio) * totalAmount;
+            });
+            break;
+        default:
+            alert('不正な清算方法が選択されました。');
             return;
-        }
-        
-        ratioInputs.forEach(input => {
-            const name = input.dataset.name;
-            const ratio = parseFloat(input.value) || 0;
-            shares[name].shouldPay = (ratio / totalRatio) * totalAmount;
-        });
-    } else {
-        // 均等割り勘
-        const perPerson = totalAmount / participants.length;
-        participants.forEach(name => {
-            shares[name].shouldPay = perPerson;
-        });
     }
-    
+
     // 差額を計算
     participants.forEach(name => {
         shares[name].balance = shares[name].paid - shares[name].shouldPay;
@@ -243,37 +246,14 @@ function calculateMinimalTransactions(shares, participants) {
     creditors.sort((a, b) => b.amount - a.amount);
     debtors.sort((a, b) => b.amount - a.amount);
     
-    const settlements = [];
-    
     // 債務者から債権者への支払いを計算
-    while (debtors.length > 0 && creditors.length > 0) {
-        const debtor = debtors[0];
-        const creditor = creditors[0];
-        
-        const amount = Math.min(debtor.amount, creditor.amount);
-        
-        // 小数点第2位までに丸める
-        const roundedAmount = Math.round(amount * 100) / 100;
-        
-        if (roundedAmount > 0) {
-            settlements.push({
-                from: debtor.name,
-                to: creditor.name,
-                amount: roundedAmount
-            });
-        }
-        
-        debtor.amount -= amount;
-        creditor.amount -= amount;
-        
-        // 0になった人を配列から削除
-        if (debtor.amount < 0.01) {
-            debtors.shift();
-        }
-        
-        if (creditor.amount < 0.01) {
-            creditors.shift();
-        }
+    const settlements = [];
+    for (let i = 0; i < creditors.length; i++) {
+        settlements.push({
+            from: debtors[i].name,
+            to: creditors[i].name,
+            amount: Math.round(Math.min(debtors[i].amount, creditor[i].amount) * 100) / 100
+        });
     }
     
     return settlements;
@@ -330,6 +310,7 @@ function displayResults(payments, shares, settlements, totalAmount) {
             const div = document.createElement('div');
             div.className = 'result-item';
             div.innerHTML = `
+                <!-- 右矢印svgアイコン -->
                 <svg class="icon" viewBox="0 0 24 24" style="color: #3b82f6; margin-right: 8px;">
                     <path d="M5 12h14M12 5l7 7-7 7"></path>
                 </svg>

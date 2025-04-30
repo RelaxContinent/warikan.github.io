@@ -29,13 +29,14 @@
                             <input type="text" placeholder="名前を入力" class="participant-name">
                         </td>
                         <td class="actions-cell">
-                            <button onclick="removeParticipant(this)" class="btn-danger">削除</button>
+                            <button onclick="removeParticipant(this)" class="btn-delete">削除</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
             
             <button onclick="addParticipant()" class="btn-primary btn-add">
+                <!-- プラスsvgアイコン -->
                 <svg class="icon" viewBox="0 0 24 24">
                     <path d="M12 5v14M5 12h14"></path>
                 </svg>
@@ -66,13 +67,14 @@
                             <input type="number" placeholder="金額" class="amount" min="0" step="1">
                         </td>
                         <td class="actions-cell">
-                            <button onclick="removePayment(this)" class="btn-danger">削除</button>
+                            <button onclick="removePayment(this)" class="btn-delete">削除</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
             
             <button onclick="addPayment()" class="btn-primary btn-add">
+                <!-- プラスsvgアイコン -->
                 <svg class="icon" viewBox="0 0 24 24">
                     <path d="M12 5v14M5 12h14"></path>
                 </svg>
@@ -109,6 +111,7 @@
         </div>
         
         <button onclick="calculate()" class="btn-success">
+            <!-- プラスマイナスsvgアイコン -->
             <svg class="icon" viewBox="0 0 24 24" style="margin-right: 8px;">
                 <path d="M9 7h6m-3-3v6m-6 3h12"></path>
             </svg>
